@@ -1,4 +1,4 @@
-#%%writefile app.py
+%%writefile app.py
 import streamlit as st
 import pandas as pd
 
@@ -7,7 +7,7 @@ import pandas as pd
 # ---------------------------------------------------------
 PAGE_TITLE = "投票アプリ"
 APP_HEADER = "🗳️ 議題一覧"
-APP_DESCRIPTION = "議題が表示されます"
+APP_DESCRIPTION = "みんなで意見を集めよう！気になる議題に投票できます。"
 
 # ---------------------------------------------------------
 # 2. ページ設定
@@ -19,46 +19,29 @@ st.set_page_config(
 )
 
 # ---------------------------------------------------------
-# 3. カスタムCSS
+# 3. サイドバー（画面遷移メニュー）
 # ---------------------------------------------------------
-st.markdown("""
-    <style>
-    .block-container {
-        padding-top: 2rem;
-        padding-bottom: 2rem;
-    }
-    .stat-text {
-        font-size: 0.9rem;
-        color: #666;
-        text-align: center;
-        margin-top: 10px;
-    }
-    </style>
-""", unsafe_allow_html=True)
-
-# ---------------------------------------------------------
-# 4. サイドバー（画面遷移メニュー）
-# ---------------------------------------------------------
-st.sidebar.title("📌 メニュー")
 with st.sidebar:
-    
-    col_nav1, col_nav2, col_nav3, col_nav4 = st.columns(4)
+    st.title("📌 メニュー")
 
-    with col_nav1:
-        if st.button("🏠 HOME"):
-            st.switch_page("home.py")
+    if st.button("🏠 HOME", use_container_width=True):
+        st.switch_page("home.py")
 
-    with col_nav2:
-        if st.button("📋 議題一覧"):
-            st.switch_page("app.py")   # ← 自分自身でもOK
+    if st.button("📋 議題一覧", use_container_width=True):
+        st.switch_page("app.py")
 
-    with col_nav3:
-        if st.button("➕ 議題作成"):
-            st.switch_page("pages/create_topic.py")
+    if st.button("➕ 議題作成", use_container_width=True):
+        st.switch_page("pages/create_topic.py")
 
-    with col_nav4:
-        if st.button("📊 投票結果"):
-            st.switch_page("pages/results.py")
+    if st.button("📊 投票結果", use_container_width=True):
+        st.switch_page("pages/results.py")
+
+# ---------------------------------------------------------
+# 4. ヘッダー
+# ---------------------------------------------------------
+st.title(APP_HEADER)
+st.caption(APP_DESCRIPTION)
+st.divider()
 
 # ---------------------------------------------------------
 # 5. 議題リスト（仮データ）
@@ -70,18 +53,18 @@ topics = [
 ]
 
 # ---------------------------------------------------------
-# 6. 議題表示と投票ボタン
+# 6. 議題表示（カード風・純正UI）
 # ---------------------------------------------------------
-st.header("📋 議題一覧")
-
 for topic in topics:
-    st.subheader(topic["title"])
-    col1, col2 = st.columns([1, 2])
+    with st.container(border=True):
+        st.subheader(topic["title"])
 
-    with col1:
-        if st.button(f"投票 [{topic['id']}]", key=f"vote_{topic['id']}"):
-            topic["votes"] += 1
-            st.success("投票しました！")
+        col1, col2 = st.columns([1, 2])
 
-    with col2:
-        st.write(f"現在の投票数: {topic['votes']}")
+        with col1:
+            if st.button("👍 投票する", key=f"vote_{topic['id']}"):
+                topic["votes"] += 1
+                st.success("投票しました！")
+
+        with col2:
+            st.write(f"現在の投票数：{topic['votes']} 票")
