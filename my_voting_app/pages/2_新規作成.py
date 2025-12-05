@@ -80,8 +80,8 @@ with st.container(border=True):
             except Exception as e:
                 # もし設定ミスなどで保存できなかったらエラーを表示
                 st.error(f"スプレッドシートへの保存に失敗しました...: {e}")
-            
-            st.success(f"✅ 議題「{title}」を作成しました！")
+
             st.balloons()
+
 
 
