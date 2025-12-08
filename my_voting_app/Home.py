@@ -1,10 +1,11 @@
 import streamlit as st
 import os
+from PIL import Image
 # ---------------------------------------------------------
 # 1. 設定 & 定数
 # ---------------------------------------------------------
 PAGE_TITLE = "投票アプリ Home"
-APP_HEADER = "🗳️ 投票アプリへようこそ！"
+APP_HEADER = "投票アプリへようこそ！"
 APP_DESCRIPTION = "チームの意見を一つに。新しい議題を作ったり、投票に参加しましょう。"
 ICON_PATH = os.path.join(os.path.dirname(__file__), "images/icon_01.png")
 
@@ -37,8 +38,30 @@ def main():
     # 外枠のコンテナ
     with st.container(border=True):
         
-        # --- ヘッダー ---
-        st.title(APP_HEADER)
+     # --- ヘッダー（ここを書き換え！） ---
+        
+        # 1. 画像を読み込む
+        try:
+            icon_image = Image.open("images/icon_01.jpg")
+        except:
+            icon_image = None # 画像がなかったら表示しない
+
+        # 2. カラムで横並びにする（左:画像、右:タイトル）
+        # [1, 5] は「画像の幅:1 に対して 文字の幅:5」という比率です
+        col_img, col_title = st.columns([1, 5])
+
+        with col_img:
+            if icon_image:
+                # 画像を表示（widthでサイズを少し調整できます）
+                st.image(icon_image, use_container_width=True)
+            else:
+                # 画像がない時の予備（絵文字）
+                st.write("🗳️")
+
+        with col_title:
+            # タイトルを表示
+            st.title(APP_HEADER)
+        
         st.markdown(APP_DESCRIPTION)
         st.divider()
 
@@ -59,6 +82,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
