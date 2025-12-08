@@ -113,6 +113,7 @@ for index, topic in topics_df.iterrows():
 
     if state_key not in st.session_state:
         st.session_state[state_key] = False
+    st.session_state[state_key] = False
 
     title = topic["title"]
     author = topic.get("author", "不明")
@@ -161,6 +162,7 @@ for index, topic in topics_df.iterrows():
                 counts = topic_votes["option"].value_counts()
                 for opt in options:
                     st.write(f"{opt}：{counts.get(opt, 0)} 票")
+
 
 
 
