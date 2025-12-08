@@ -2,6 +2,7 @@ import streamlit as st
 import datetime
 import sys
 import os
+from background import set_background  #  # 背景画像の設定ファイルをインポート
 
 # パス設定
 sys.path.append(os.path.abspath(os.path.dirname(__file__) + '/..'))
@@ -136,6 +137,7 @@ else:
                     
                 except Exception as e:
                     st.error(f"スプレッドシートへの保存に失敗しました...: {e}")
+
 
 
 
