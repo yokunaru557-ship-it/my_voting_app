@@ -12,7 +12,6 @@ import db_handler
 st.set_page_config(page_title="投票結果", page_icon="📊")
 
 st.title("📊 投票結果一覧")
-st.caption("現在の投票状況を自動更新しています")
 
 # データ取得
 topics_df = db_handler.get_topics_from_sheet()
@@ -54,3 +53,4 @@ else:
 st.divider()
 if st.button("🔄 更新"):
     st.rerun()
+
