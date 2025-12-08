@@ -8,7 +8,7 @@ import os
 # ---------------------------------------------------------
 st.set_page_config(
     page_title=PAGE_TITLE,
-    page_icon=("images/icon_01.ico"),
+    page_icon="✨",
     layout="centered" # スマホでも見やすいよう中央寄せ
 )
 
@@ -77,6 +77,7 @@ def main():
 if __name__ == "__main__":
 
     main()
+
 
 
 
