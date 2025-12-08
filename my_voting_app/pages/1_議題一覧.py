@@ -35,7 +35,7 @@ st.caption(APP_DESCRIPTION)
 st.divider()
 
 # ---------------------------------------------------------
-# ✅ 5. スプレッドシートから議題を取得
+# 5. スプレッドシートから議題を取得
 # ---------------------------------------------------------
 topics_df = db_handler.get_topics_from_sheet()
 
@@ -44,12 +44,12 @@ if topics_df.empty:
     st.stop()
 
 # ---------------------------------------------------------
-# ✅ 6. 投票データも取得
+# 6. 投票データも取得
 # ---------------------------------------------------------
 votes_df = db_handler.get_votes_from_sheet()
 
 # ---------------------------------------------------------
-# ✅ 7. 議題表示（本番データ）
+# 7. 議題表示（本番データ）
 # ---------------------------------------------------------
 for index, topic in topics_df.iterrows():
 
@@ -59,14 +59,14 @@ for index, topic in topics_df.iterrows():
     deadline = topic.get("deadline", "")
     created_at = topic.get("created_at", "")
 
-    # ✅ この議題の投票データだけ抽出
+    # この議題の投票データだけ抽出
     topic_votes = votes_df[votes_df["topic_title"] == title] if not votes_df.empty else pd.DataFrame()
 
     with st.container(border=True):
         st.subheader(title)
         st.caption(f"作成者：{author}｜締切：{deadline}")
 
-        # ✅ 締切チェック
+        # 締切チェック
         is_expired = False
         try:
             if datetime.date.today() > datetime.datetime.strptime(deadline, "%Y-%m-%d").date():
@@ -78,7 +78,7 @@ for index, topic in topics_df.iterrows():
         col1, col2 = st.columns([1, 2])
 
         # -------------------------
-        # ✅ 投票UI
+        # 投票UI
         # -------------------------
         with col1:
             selected_option = st.radio(
@@ -94,7 +94,7 @@ for index, topic in topics_df.iterrows():
                 st.rerun()
 
         # -------------------------
-        # ✅ 集計表示
+        # 集計表示
         # -------------------------
         with col2:
             st.write("### 📊 現在の投票数")
@@ -106,3 +106,4 @@ for index, topic in topics_df.iterrows():
                 counts = topic_votes["option"].value_counts()
                 for opt in options:
                     st.write(f"{opt}：{counts.get(opt, 0)} 票")
+
