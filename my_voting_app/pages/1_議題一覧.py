@@ -61,7 +61,12 @@ with col4:
 # ---------------------------------------------------------
 # 5. スプレッドシートから議題を取得
 # ---------------------------------------------------------
-topics_df = db_handler.get_topics_from_sheet()
+#topics_df = db_handler.get_topics_from_sheet()
+@st.cache_data(ttl=30)  #  30秒間キャッシュ
+def load_topics():
+    return db_handler.get_topics_from_sheet()
+topics_df = load_topics()
+
 if topics_df.empty:
     st.info("まだ議題が登録されていません。")
     st.stop()
@@ -69,14 +74,19 @@ if topics_df.empty:
 # ---------------------------------------------------------
 # 6. 投票データも取得
 # ---------------------------------------------------------
-votes_df = db_handler.get_votes_from_sheet()
+#votes_df = db_handler.get_votes_from_sheet()
+@st.cache_data(ttl=30)
+def load_votes():
+    return db_handler.get_votes_from_sheet()
+votes_df = load_votes()
 
-# 現在日時
-now = datetime.datetime.now()
+
 
 # ---------------------------------------------------------
 # 7. 日付と時刻を含む datetime に変換
 # ---------------------------------------------------------
+# 現在日時
+now = datetime.datetime.now()
 topics_df["deadline"] = pd.to_datetime(topics_df["deadline"], errors="coerce", format="%Y-%m-%d %H:%M")
 
 # 締切があるものだけ残す（締切済み非表示）
@@ -146,6 +156,7 @@ for index, topic in topics_df.iterrows():
                 counts = topic_votes["option"].value_counts()
                 for opt in options:
                     st.write(f"{opt}：{counts.get(opt, 0)} 票")
+
 
 
 
