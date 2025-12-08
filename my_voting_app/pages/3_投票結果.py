@@ -47,15 +47,13 @@ else:
     result_df = pd.DataFrame(result)
 
     st.table(result_df)
-    # グラフ用に数値型に変換
-　　result_df["投票数"] = pd.to_numeric(result_df["投票数"])
-
-　　st.bar_chart(result_df.set_index("選択肢")["投票数"]
+　　st.bar_chart(result_df.set_index("選択肢"))
 
 # ページの最後 一旦手動更新
 st.divider()
 if st.button("🔄 更新"):
     st.rerun()
+
 
 
 
