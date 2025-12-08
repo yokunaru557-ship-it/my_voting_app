@@ -103,23 +103,16 @@ if input_date:
 # ---------------------------------------------------------
 # 8. 議題ループ表示
 # ---------------------------------------------------------
-# ---------------------------------------------------------
-# 8. 議題ループ表示
-# ---------------------------------------------------------
 for index, topic in topics_df.iterrows():
-
-    button_key = f"vote_btn_{index}"     # ✅ ボタン専用キー
-    state_key  = f"vote_state_{index}"   # ✅ 状態保存専用キー
-
-    if state_key not in st.session_state:
-        st.session_state[state_key] = False
-    st.session_state[state_key] = False
-
+    vote_key = f"vote_{index}"
+    if vote_key not in st.session_state:
+        st.session_state[vote_key] = False
     title = topic["title"]
     author = topic.get("author", "不明")
     options = topic["options"].split("/")
     deadline = topic.get("deadline", pd.NaT)
 
+    # deadline文字列化
     if pd.notna(deadline):
         deadline_str = deadline.strftime("%Y-%m-%d %H:%M")
     else:
@@ -138,20 +131,15 @@ for index, topic in topics_df.iterrows():
                 options,
                 key=f"radio_{index}"
             )
-
-            if st.button(
-                "👍 投票する",
-                key=button_key,                     # ✅ ボタン専用
-                disabled=st.session_state[state_key]  # ✅ 状態専用
-            ):
-                st.session_state[state_key] = True   # ✅ 安全に代入できる
+            if st.button("👍 投票する", key=f"vote_{index}",disabled=st.session_state[vote_key]):
                 db_handler.add_vote_to_sheet(title, selected_option)
                 st.success("投票しました！")
                 st.balloons()
                 time.sleep(3)
                 st.rerun()
+               
 
-        # 投票数表示
+        # 投票数集計表示
         with col2:
             st.write("### 📊 現在の投票数")
             topic_votes = votes_df[votes_df["topic_title"] == title] if not votes_df.empty else pd.DataFrame()
@@ -162,9 +150,6 @@ for index, topic in topics_df.iterrows():
                 counts = topic_votes["option"].value_counts()
                 for opt in options:
                     st.write(f"{opt}：{counts.get(opt, 0)} 票")
-
-
-
 
 
 
