@@ -60,8 +60,10 @@ votes_df = db_handler.get_votes_from_sheet()
 # 今日の日付
 now = datetime.datetime.now()
 
-# 1. created_at や deadline を date 型に変換
-topics_df["deadline"] = pd.to_datetime(topics_df["deadline"], errors="coerce").dt.date
+
+# 1. 日付と時刻を含む datetime に変換
+topics_df["deadline"] = pd.to_datetime(topics_df["deadline"], errors="coerce")
+
 
 # 2. 締切があるものだけ残す（締切済みを非表示）
 topics_df = topics_df[topics_df["deadline"].isna() | (topics_df["deadline"] >= now)]
@@ -82,7 +84,12 @@ for index, topic in topics_df.iterrows():
 
     with st.container(border=True):
         st.subheader(title)
-        st.caption(f"作成者：{author}｜締切：{deadline}")
+        deadline = topic.get("deadline", "")
+        if pd.notna(deadline):
+            deadline_str = deadline.strftime("%Y-%m-%d %H:%M")
+        else:
+            deadline_str = ""
+        st.caption(f"作成者：{author}｜締切：{deadline_str}")
 
         col1, col2 = st.columns([1, 2])
 
@@ -107,6 +114,7 @@ for index, topic in topics_df.iterrows():
                 counts = topic_votes["option"].value_counts()
                 for opt in options:
                     st.write(f"{opt}：{counts.get(opt, 0)} 票")
+
 
 
 
