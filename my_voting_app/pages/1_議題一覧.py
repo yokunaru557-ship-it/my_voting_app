@@ -93,7 +93,7 @@ if input_date:
         topics_df["deadline"].dt.date == input_date
     ]
 
-    # ✅ 該当データがあるか判定
+    # 該当データがあるか判定
     if filtered_df.empty:
         st.warning("⚠️ 指定した締切日の議題は見つかりませんでした。")
         st.stop()   # これ以降の表示処理を止める
@@ -145,6 +145,7 @@ for index, topic in topics_df.iterrows():
                 counts = topic_votes["option"].value_counts()
                 for opt in options:
                     st.write(f"{opt}：{counts.get(opt, 0)} 票")
+
 
 
 
