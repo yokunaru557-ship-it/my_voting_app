@@ -1,3 +1,5 @@
+st.write("✅ 3_投票結果.py が読み込まれました")
+
 import streamlit as st
 import pandas as pd
 import sys
@@ -65,3 +67,4 @@ else:
 # ---------------------------------------------------------
 time.sleep(5)
 st.rerun()
+
