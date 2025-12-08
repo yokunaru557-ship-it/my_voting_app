@@ -36,7 +36,7 @@ st.divider()
 if "fg" not in st.session_state:
     st.session_state["fg"] = 0  # 0: 期限順, 1: 新着順
 # 2列に分けてボタンを配置
-col1, col2 = st.columns(2)
+col1, col2 = st.columns([0.3, 0.3])  # 余白は残る
 with col1:
     if st.button("⏰ 期限順"):
         st.session_state.fg = 0
@@ -110,6 +110,7 @@ for index, topic in topics_df.iterrows():
                 counts = topic_votes["option"].value_counts()
                 for opt in options:
                     st.write(f"{opt}：{counts.get(opt, 0)} 票")
+
 
 
 
