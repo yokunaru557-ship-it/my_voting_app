@@ -51,29 +51,28 @@ votes_df = db_handler.get_votes_from_sheet()
 # 今日の日付
 today = datetime.date.today()
 
+# 今日の日付
+today = datetime.date.today()
+
+# 1. created_at や deadline を date 型に変換
+topics_df["deadline"] = pd.to_datetime(topics_df["deadline"], errors="coerce").dt.date
+
+# 2. 締切があるものだけ残す（締切済みを非表示）
+topics_df = topics_df[topics_df["deadline"].isna() | (topics_df["deadline"] >= today)]
+
+# 3. 締切日で昇順ソート（期限が近いものから表示）
+topics_df = topics_df.sort_values("deadline", ascending=True)
+
+# 4. ループで表示
 for index, topic in topics_df.iterrows():
-
-    # 締切日を取得
-    deadline_str = topic.get("deadline", "")
-    try:
-        deadline = datetime.datetime.strptime(deadline_str, "%Y-%m-%d").date()
-    except:
-        deadline = None  # 日付不明なら表示する
-
-    # 締切済みならスキップ
-    if deadline and today > deadline:
-        continue  # この議題は表示しない
-
-    # ----- 以下は既存の表示処理 -----
     title = topic["title"]
     author = topic.get("author", "不明")
     options = topic["options"].split("/")
-
-    topic_votes = votes_df[votes_df["topic_title"] == title] if not votes_df.empty else pd.DataFrame()
+    deadline = topic.get("deadline", "")
 
     with st.container(border=True):
         st.subheader(title)
-        st.caption(f"作成者：{author}｜締切：{deadline_str}")
+        st.caption(f"作成者：{author}｜締切：{deadline}")
 
         col1, col2 = st.columns([1, 2])
 
@@ -83,7 +82,6 @@ for index, topic in topics_df.iterrows():
                 options,
                 key=f"radio_{index}"
             )
-
             if st.button("👍 投票する", key=f"vote_{index}"):
                 db_handler.add_vote_to_sheet(title, selected_option)
                 st.success("投票しました！")
@@ -91,6 +89,7 @@ for index, topic in topics_df.iterrows():
 
         with col2:
             st.write("### 📊 現在の投票数")
+            topic_votes = votes_df[votes_df["topic_title"] == title] if not votes_df.empty else pd.DataFrame()
             if topic_votes.empty:
                 for opt in options:
                     st.write(f"{opt}：0 票")
@@ -98,6 +97,7 @@ for index, topic in topics_df.iterrows():
                 counts = topic_votes["option"].value_counts()
                 for opt in options:
                     st.write(f"{opt}：{counts.get(opt, 0)} 票")
+
 
 
 
