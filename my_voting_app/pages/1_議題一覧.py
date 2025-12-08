@@ -40,7 +40,7 @@ if "fg" not in st.session_state:
     st.session_state["fg"] = 0  # 0: 締切順, 1: 新着順
 
 # 右寄せでボタンを横並びに配置
-col1, col2, col3, col4 = st.columns([0.35, 0.35, 0.15, 0.15])
+col1, col2, col3, col4 = st.columns([0.38, 0.38, 0.12, 0.12])
 with col1:
     input_date = st.date_input("締め切り",min_value=datetime.date.today())
    
@@ -145,6 +145,7 @@ for index, topic in topics_df.iterrows():
                 counts = topic_votes["option"].value_counts()
                 for opt in options:
                     st.write(f"{opt}：{counts.get(opt, 0)} 票")
+
 
 
 
