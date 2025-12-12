@@ -130,7 +130,7 @@ else:
             - （その他、データから読み取れる特筆すべき点）
             
             ---
-            (以上で終了)
+            (以上で終了しこれ以降は表示しない)
             
             # 解析対象データ (CSV)
             {result_df.to_csv(index=False)}
@@ -152,6 +152,7 @@ else:
 st.divider()
 if st.button("🔄 更新"):
     st.rerun()
+
 
 
 
