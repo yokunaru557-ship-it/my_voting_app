@@ -152,7 +152,7 @@ else:
                 contents=analysis_prompt
             )
     
-           st.write("### 🧠 分析結果")
+           
            st.write(response.text)
 
 
@@ -161,6 +161,7 @@ else:
 st.divider()
 if st.button("🔄 更新"):
     st.rerun()
+
 
 
 
