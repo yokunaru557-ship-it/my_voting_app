@@ -3,6 +3,7 @@ import os
 from PIL import Image
 import base64
 import google_auth_oauthlib.flow
+import json # ▼追加：Cloudの設定を読み込むために必要
 from background import set_background
 
 # ---------------------------------------------------------
@@ -16,7 +17,13 @@ PAGEICON_PATH = os.path.join(BASE_DIR, "images/icon_01.png")
 # Googleログイン設定
 CLIENT_SECRETS_FILE = os.path.join(BASE_DIR, "client_secret.json")
 SCOPES = ['openid', 'https://www.googleapis.com/auth/userinfo.email']
-REDIRECT_URI = 'http://localhost:8501'
+
+# ▼▼▼ 修正：CloudとローカルでURLを自動切り替え ▼▼▼
+# Secretsに "auth" 設定があればCloud用のURLを使う
+if "auth" in st.secrets and "redirect_uri" in st.secrets["auth"]:
+    REDIRECT_URI = st.secrets["auth"]["redirect_uri"]
+else:
+    REDIRECT_URI = 'http://localhost:8501' # ローカル用
 
 # ---------------------------------------------------------
 # 2. ページ設定
@@ -53,29 +60,47 @@ def header_with_icon(icon_path, text):
     st.markdown(header_html, unsafe_allow_html=True)
 
 # ---------------------------------------------------------
-# Googleログイン処理を行う関数（シンプル版に戻しました）
+# Googleログイン処理（Cloud対応ハイブリッド版）
 # ---------------------------------------------------------
 def google_login():
-    if not os.path.exists(CLIENT_SECRETS_FILE):
-        st.error("⚠️ client_secret.json が見つかりません。")
-        return None # 戻り値を1つに戻す
+    flow = None
+    
+    # 1. PCにファイルがあるか探す（ローカル用）
+    if os.path.exists(CLIENT_SECRETS_FILE):
+        flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(
+            CLIENT_SECRETS_FILE,
+            scopes=SCOPES,
+            redirect_uri=REDIRECT_URI
+        )
+    
+    # 2. ファイルがないならCloudのSecretsを探す（Cloud用）
+    elif "auth" in st.secrets and "client_secret_json" in st.secrets["auth"]:
+        try:
+            # Secretsの文字列をプログラムで使える形に変換
+            client_config = json.loads(st.secrets["auth"]["client_secret_json"])
+            
+            flow = google_auth_oauthlib.flow.Flow.from_client_config(
+                client_config,
+                scopes=SCOPES,
+                redirect_uri=REDIRECT_URI
+            )
+        except Exception as e:
+            st.error(f"Secrets設定エラー: {e}")
+            return None
+    else:
+        st.error("⚠️ 認証キーが見つかりません。client_secret.jsonを置くか、Secretsを設定してください。")
+        return None
 
-    flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(
-        CLIENT_SECRETS_FILE,
-        scopes=SCOPES,
-        redirect_uri=REDIRECT_URI
-    )
-
+    # --- 認証フローの実行 ---
     if 'code' not in st.query_params:
-        # まだログインしていない時
+        # ログインボタン表示
         auth_url, _ = flow.authorization_url(prompt='consent')
-        
         st.title("🔒 ログイン")
         st.write("アプリを利用するにはGoogleアカウントでログインしてください。")
         st.link_button("Googleでログイン", auth_url, type="primary")
-        return None # 戻り値を1つに戻す
+        return None
     else:
-        # Googleから戻ってきた時
+        # Googleから戻ってきた後の処理
         code = st.query_params['code']
         try:
             flow.fetch_token(code=code)
@@ -89,10 +114,9 @@ def google_login():
                 credentials.id_token, token_request, credentials.client_id)
             
             email = id_info.get('email')
-            # 名前を取得するコードは削除しました
             
             st.query_params.clear()
-            return email # メールアドレスだけを返す
+            return email
             
         except Exception as e:
             st.error(f"ログインエラー: {e}")
@@ -107,7 +131,6 @@ def main():
 
     # ログインしていない場合
     if st.session_state.logged_in_user is None:
-        # 戻り値を1つ（メールだけ）受け取る形に戻す
         user_email = google_login()
         if user_email:
             st.session_state.logged_in_user = user_email
@@ -119,7 +142,6 @@ def main():
     with st.container(border=True):
         header_with_icon(PAGEICON_PATH, "投票アプリへようこそ！")
         
-        # 表示もメールアドレスだけに戻す
         st.caption(f"ログイン中: {st.session_state.logged_in_user}")
         
         st.markdown(APP_DESCRIPTION)
