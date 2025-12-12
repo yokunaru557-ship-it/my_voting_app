@@ -140,7 +140,7 @@ else:
             - （票が割れた、特定の一強である、などの分布の特徴）
             - （その他、データから読み取れる特筆すべき点）
                   
-            ---
+            
             # 解析対象データ (CSV)
             {result_df.to_csv(index=False)}
             """
@@ -161,6 +161,7 @@ else:
 st.divider()
 if st.button("🔄 更新"):
     st.rerun()
+
 
 
 
