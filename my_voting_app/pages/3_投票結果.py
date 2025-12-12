@@ -142,8 +142,8 @@ else:
                   
             
             # 解析対象データ 
-            議題{selected_topic}
-            CSVデータ{result_df.to_csv(index=False)}
+            議題:{selected_topic}
+            CSVデータ:{result_df.to_csv(index=False)}
             """
 
 
@@ -162,6 +162,7 @@ else:
 st.divider()
 if st.button("🔄 更新"):
     st.rerun()
+
 
 
 
