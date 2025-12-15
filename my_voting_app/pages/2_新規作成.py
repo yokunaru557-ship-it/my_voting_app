@@ -55,7 +55,6 @@ def remove_option():
 if st.session_state.creation_completed:
     st.title("✅ 作成完了！")
     st.success("新しい議題を作成しました。")
-    st.balloons()
     
     st.markdown("---")
     
@@ -174,6 +173,7 @@ else:
                     st.rerun() 
                 except Exception as e:
                     st.error(f"保存に失敗しました...: {e}")
+
 
 
 
