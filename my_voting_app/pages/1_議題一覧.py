@@ -89,6 +89,7 @@ if input_date:
         topics_df = filtered_df
 
 if my_only:
+    current_user = str(st.session_state.logged_in_user).strip()
     topics_df = topics_df[
         topics_df["owner_email"].str.strip() == current_user
     ]
@@ -194,6 +195,7 @@ for index, topic in topics_df.iterrows():
                     counts = topic_votes["option"].value_counts()
                     for opt in options:
                         st.write(f"{opt}：{counts.get(opt, 0)} 票")
+
 
 
 
