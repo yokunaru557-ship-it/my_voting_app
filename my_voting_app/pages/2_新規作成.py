@@ -79,17 +79,30 @@ else:
         title = st.text_input("議題のタイトル", placeholder="例：来週のランチどこ行く？", key="input_title")
         author = st.text_input("作成者名", placeholder="例：山田 太郎", key="input_author")
 
+        # ▼▼▼ 修正箇所：デフォルト値を現在時刻（日本時間）にする ▼▼▼
+        # 日本時間の定義
+        t_delta = datetime.timedelta(hours=9)
+        JST = datetime.timezone(t_delta, 'JST')
+        
+        # 現在時刻を取得し、使いやすいように「1時間後」を初期値にする
+        # （ピッタリ現在時刻だと、作成ボタンを押すまでの数秒で「過去」になってしまいエラーになるため）
+        now_jst = datetime.datetime.now(JST) + datetime.timedelta(hours=1)
+
         # --- 締め切り設定 ---
         st.markdown("##### 📅 締め切り設定")
         col_date, col_hour, col_min = st.columns([2, 1, 1])
-        with col_date:
-            input_date = st.date_input("締め切り日", min_value=datetime.date.today())
-        with col_hour:
-            input_hour = st.number_input("時", min_value=0, max_value=23, value=12, step=1)
-        with col_min:
-            input_minute = st.number_input("分", min_value=0, max_value=59, value=0, step=1)
         
-        # 入力された日付と時間を合体（まだタイムゾーンなし）
+        with col_date:
+            # 今日の日付（日本時間）をセット
+            input_date = st.date_input("締め切り日", value=now_jst.date(), min_value=datetime.date.today())
+        with col_hour:
+            # 現在の「時」をセット
+            input_hour = st.number_input("時", min_value=0, max_value=23, value=now_jst.hour, step=1)
+        with col_min:
+            # 現在の「分」をセット
+            input_minute = st.number_input("分", min_value=0, max_value=59, value=now_jst.minute, step=1)
+        
+        # 日付と時間を合体
         deadline_dt = datetime.datetime.combine(input_date, datetime.time(input_hour, input_minute))
         
         st.markdown("---")
@@ -127,19 +140,14 @@ else:
                 st.error("⚠️ タイトルを入力してください！")
                 is_valid = False
             
-            # 2. 日付チェック（▼▼▼ ここを修正：日本時間で判定 ▼▼▼）
-            # 日本時間（JST）の定義
-            t_delta = datetime.timedelta(hours=9)
-            JST = datetime.timezone(t_delta, 'JST')
+            # 2. 日付チェック（日本時間で判定）
+            # 判定用の現在時刻（バッファなしの本当の現在時刻）を再取得
+            check_now_jst = datetime.datetime.now(JST)
             
-            # 現在の日本時間を取得
-            now_jst = datetime.datetime.now(JST)
-            
-            # 入力された時間を日本時間扱いにする（比較のために変換）
+            # 入力された時間を日本時間扱いにする
             deadline_aware = deadline_dt.replace(tzinfo=JST)
             
-            # 比較実行
-            if deadline_aware <= now_jst:
+            if deadline_aware <= check_now_jst:
                 st.error("⚠️ 締め切り時間が過去になっています。現在より未来の日時を設定してください。")
                 is_valid = False
 
@@ -166,6 +174,7 @@ else:
                     st.rerun() 
                 except Exception as e:
                     st.error(f"保存に失敗しました...: {e}")
+
 
 
 
