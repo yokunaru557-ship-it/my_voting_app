@@ -119,25 +119,43 @@ def get_votes_from_sheet():
 # ---------------------------------------------------------
 # 4. 議題データ削除
 # -----------------------------------------------------
-def delete_topic(title: str, user_email: str, logical=True):
-    sheet = client.open_by_key(TOPICS_SHEET_ID).sheet1
-    data = sheet.get_all_records()
-    df = pd.DataFrame(data)
+def delete_topic(topic_title, owner_email, logical=True):
+    """
+    topic_title: 削除対象の議題タイトル
+    owner_email: 削除権限を持つユーザーのメールアドレス
+    logical: True = 論理削除, False = 物理削除
+    """
+    sheet = connect_to_sheet()
+    if sheet is None:
+        return False
 
-    # 自分の議題のみ対象
-    target = df[(df["title"] == title) & (df["owner_email"] == user_email)]
+    try:
+        worksheet = sheet.worksheet("topics")
+        records = worksheet.get_all_records()
+        df = pd.DataFrame(records)
 
-    if target.empty:
-        return False  # 削除対象なし
+        # 自分が作成した議題のみ削除対象
+        target_rows = df[(df["title"] == topic_title) & (df["owner_email"] == owner_email)]
 
-    for idx in target.index:
-        if logical:
-            # 論理削除: status を "deleted" に変更
-            sheet.update_cell(idx+2, df.columns.get_loc("status")+1, "deleted")
-        else:
-            # 物理削除: 行ごと削除
-            sheet.delete_row(idx+2)
-    return True
+        if target_rows.empty:
+            return False  # 削除対象なし
+
+        for idx in target_rows.index:
+            # gspread は行番号 1始まり + ヘッダー行があるので +2
+            row_number = idx + 2
+
+            if logical:
+                # 論理削除: status を "deleted" に変更
+                worksheet.update_cell(row_number, 6, "deleted")
+            else:
+                # 物理削除: 行ごと削除
+                worksheet.delete_row(row_number)
+
+        return True
+
+    except Exception as e:
+        st.error(f"削除エラー: {e}")
+        return False
 
 # ---------------------------------------------------------
 # 5. ステータスを終了にする
@@ -154,6 +172,7 @@ def close_topic_status(topic_title):
         
     except Exception as e:
         st.error(f"ステータス更新エラー: {e}")
+
 
 
 
