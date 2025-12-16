@@ -53,15 +53,24 @@ with col4:
     if st.button("⬇️ 降順"): st.session_state.fg = 1
 
 # ---------------------------------------------------------
-# データ取得
+# データ取得（ここを修正！）
 # ---------------------------------------------------------
-# ▼▼▼ 修正：API制限回避のため、15秒間隔の読み込みに変更 ▼▼▼
-@st.cache_data(ttl=15)
+
+# ▼▼▼ 修正1：キャッシュを削除（ttl設定を消すのではなく、デコレータ自体を消す） ▼▼▼
+# 学校の課題レベルのアクセス数なら、キャッシュなし(毎回読み込み)でもAPI制限には引っかかりにくいです。
+# 安全策としてキャッシュを使わず、確実に最新データを取ります。
+
 def load_topics():
     df = db_handler.get_topics_from_sheet()
+    
+    # データの「型」をすべて「文字(str)」に統一します（これが重要！）
+    # 数字の「1」と文字の「1」が違うせいで判定ミスするのを防ぎます
+    df = df.astype(str)
+    
+    # 列がない場合のエラー回避
     if "owner_email" not in df.columns:
         df["owner_email"] = ""
-    df = df.fillna("").astype(str)
+    
     return df
 
 topics_df = load_topics()
@@ -70,15 +79,17 @@ if topics_df.empty:
     st.info("まだ議題が登録されていません。")
     st.stop()
 
-# ▼▼▼ 修正：ここも15秒に変更 ▼▼▼
-@st.cache_data(ttl=15)
 def load_votes():
     df = db_handler.get_votes_from_sheet()
+    
+    # こちらもすべてのデータを「文字(str)」に統一
+    df = df.astype(str)
+    
     if "voter_email" not in df.columns:
         df["voter_email"] = ""
     if "topic_title" not in df.columns:
         df["topic_title"] = ""
-    df = df.fillna("").astype(str)
+    
     return df
 
 votes_df = load_votes()
@@ -103,9 +114,12 @@ if input_date:
     else:
         topics_df = filtered_df
 
+# ▼▼▼ 自分の議題フィルタ ▼▼▼
+# ここも文字型(str)で統一して比較
+current_user = str(st.session_state.logged_in_user)
+
 if my_only:
-    current_user_email = str(st.session_state.logged_in_user).strip()
-    topics_df = topics_df[topics_df["owner_email"].str.strip() == current_user_email]
+    topics_df = topics_df[topics_df["owner_email"] == current_user]
     if topics_df.empty:
         st.info("あなたが作成した議題はまだありません（または期限切れです）。")
         st.stop()
@@ -127,19 +141,23 @@ for index, topic in topics_df.iterrows():
         deadline_str = "未設定"
 
     is_closed = (status == 'closed')
-    current_user = str(st.session_state.logged_in_user).strip()
-
-    # ▼▼▼ 重複投票チェック ▼▼▼
+    
+    # ▼▼▼ 重複投票チェック（シンプルかつ確実な比較） ▼▼▼
     has_voted = False
     
     # 1. データ上のチェック
     if not votes_df.empty:
-        this_topic_votes = votes_df[votes_df["topic_title"] == title]
-        voter_list = this_topic_votes["voter_email"].str.strip().tolist()
+        # タイトルも「文字」同士で比較
+        this_topic_votes = votes_df[votes_df["topic_title"] == str(title)]
+        
+        # 投票者リストを取得（すでにstr変換済みなのでそのままリスト化）
+        voter_list = this_topic_votes["voter_email"].tolist()
+        
+        # 完全に一致するかチェック
         if current_user in voter_list:
             has_voted = True
     
-    # 2. 直前の操作履歴チェック（これによりTTL=15秒でも即時反映される！）
+    # 2. 直前の操作履歴チェック
     if title in st.session_state.just_voted_topics:
         has_voted = True
 
@@ -152,13 +170,11 @@ for index, topic in topics_df.iterrows():
         st.caption(f"作成者：{author}｜締め切り：{deadline_str}")
 
         # ▼ 終了ボタン表示 ▼
-        owner_email_str = str(owner_email).strip()
-        if owner_email_str and current_user == owner_email_str and not is_closed:
+        if owner_email and current_user == owner_email and not is_closed:
              with st.popover("⚠️ 投票を締め切る"):
                 st.write("本当に終了しますか？")
                 if st.button("はい、終了します", key=f"close_{index}", type="primary"):
                     db_handler.close_topic_status(title)
-                    load_topics.clear()
                     st.success("終了しました！")
                     st.rerun()
 
@@ -198,16 +214,14 @@ for index, topic in topics_df.iterrows():
                     else:
                         db_handler.add_vote_to_sheet(title, submit_value, current_user)
                         st.session_state.just_voted_topics.append(title)
-                        
-                        # 自分のキャッシュだけはクリアして即反映を試みる
-                        load_votes.clear()
                         st.success("投票しました！")
                         st.rerun()
 
         # 右カラム：投票数集計表示
         with col2:
             st.write("### 📊 現在の投票数")
-            topic_votes = votes_df[votes_df["topic_title"] == title] if not votes_df.empty else pd.DataFrame()
+            # タイトルも文字型で比較して抽出
+            topic_votes = votes_df[votes_df["topic_title"] == str(title)] if not votes_df.empty else pd.DataFrame()
             
             if options_raw == "FREE_INPUT":
                 if topic_votes.empty:
@@ -229,6 +243,7 @@ for index, topic in topics_df.iterrows():
                     counts = topic_votes["option"].value_counts()
                     for opt in options:
                         st.write(f"{opt}：{counts.get(opt, 0)} 票")
+
 
 
 
