@@ -13,6 +13,7 @@ import db_handler
 # ページ設定
 # ---------------------------------------------------------
 st.set_page_config(page_title="議題一覧", page_icon="🗳️", layout="centered")
+
 set_background("background.png")
 
 # ▼▼▼ 門番コード ▼▼▼
@@ -51,7 +52,8 @@ with col4:
 # ---------------------------------------------------------
 # データ取得
 # ---------------------------------------------------------
-@st.cache_data(ttl=10)
+# ▼▼▼ 修正：キャッシュを0秒にして、常に最新を取得させる ▼▼▼
+@st.cache_data(ttl=0)
 def load_topics():
     return db_handler.get_topics_from_sheet()
 
@@ -61,7 +63,8 @@ if topics_df.empty:
     st.info("まだ議題が登録されていません。")
     st.stop()
 
-@st.cache_data(ttl=10)
+# ▼▼▼ 修正：キャッシュを0秒にして、常に最新を取得させる ▼▼▼
+@st.cache_data(ttl=0)
 def load_votes():
     return db_handler.get_votes_from_sheet()
 
@@ -112,17 +115,24 @@ for index, topic in topics_df.iterrows():
         deadline_str = "未設定"
 
     is_closed = (status == 'closed')
+    
+    # ログイン中のユーザー（空白削除して整形）
     current_user = str(st.session_state.logged_in_user).strip()
 
-    # ▼▼▼ 重複投票チェック ▼▼▼
+    # ▼▼▼ 重複投票チェック（判定ロジック強化版） ▼▼▼
     has_voted = False
+    
     if not votes_df.empty and "voter_email" in votes_df.columns:
-        my_vote = votes_df[
-            (votes_df["topic_title"] == title) & 
-            (votes_df["voter_email"] == current_user)
-        ]
-        if not my_vote.empty:
-            has_voted = True
+        # 1. まずこの議題(title)への投票だけを抜き出す
+        this_topic_votes = votes_df[votes_df["topic_title"] == title]
+        
+        if not this_topic_votes.empty:
+            # 2. 投票者メアドをリスト化（念のため文字列変換＆空白削除）
+            voter_list = this_topic_votes["voter_email"].astype(str).str.strip().tolist()
+            
+            # 3. リストの中に自分のメアドがあるかチェック
+            if current_user in voter_list:
+                has_voted = True
 
     with st.container(border=True):
         if is_closed:
@@ -155,11 +165,11 @@ for index, topic in topics_df.iterrows():
                 else:
                     st.warning("⏰ 期限切れ")
             
-            # ▼ 投票済みならフォームを隠す ▼
+            # ▼ 投票済みの場合 ▼
             elif has_voted:
                 st.info("✅ 投票済み")
                 
-            # ▼ 未投票ならフォームを表示 ▼
+            # ▼ 未投票の場合 ▼
             else:
                 submit_value = None
                 if options_raw == "FREE_INPUT":
@@ -179,6 +189,8 @@ for index, topic in topics_df.iterrows():
                     else:
                         # メアドも一緒に保存
                         db_handler.add_vote_to_sheet(title, submit_value, current_user)
+                        
+                        # 念のためキャッシュをクリアして再読み込み
                         load_votes.clear()
                         st.success("投票しました！")
                         st.rerun()
