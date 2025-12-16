@@ -119,6 +119,18 @@ else:
     # 表表示
     st.dataframe(result_df, hide_index=True)
 
+    #議題データ削除
+    if st.button("🗑️ 議題を削除", key=f"delete_{selected_topic}"):
+    confirm = st.confirm(f"本当に「{selected_topic}」を削除しますか？")
+    if confirm:
+        deleted = db_handler.delete_topic(selected_topic, current_user, logical=True)
+        if deleted:
+            st.success(f"「{selected_topic}」を削除しました。")
+            st.experimental_rerun()
+        else:
+            st.error("削除できませんでした（権限がないか、既に削除済みです）")
+
+    
     # ===== Geminiによる分析機能 =====
     st.subheader("🔍 Gemini による投票結果分析")
     
@@ -178,5 +190,6 @@ else:
 st.divider()
 if st.button("🔄 更新"):
     st.rerun()
+
 
 
