@@ -17,6 +17,9 @@ client = genai.Client(api_key=API_KEY)
 sys.path.append(os.path.abspath(os.path.dirname(__file__) + '/..'))
 import db_handler
 
+sys.path.append(os.path.abspath(os.path.dirname(__file__) + '/..'))
+import db_handler
+
 # ページ設定
 st.set_page_config(page_title="投票結果", page_icon="📊")
 
@@ -189,6 +192,7 @@ else:
 st.divider()
 if st.button("🔄 更新"):
     st.rerun()
+
 
 
 
