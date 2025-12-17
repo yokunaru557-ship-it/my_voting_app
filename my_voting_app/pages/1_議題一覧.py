@@ -149,7 +149,7 @@ for index, topic in topics_df.iterrows():
     # 1. データ上のチェック
     if not votes_df.empty:
         # タイトルも「文字」同士で比較
-        this_topic_votes = votes_df[votes_df["topic_title"] == str(title)]
+        this_topic_votes = votes_df[votes_df["topic_title"] == str(topic["uuid"])]
         
         # 投票者リストを取得（すでにstr変換済みなのでそのままリスト化）
         voter_list = this_topic_votes["voter_email"].tolist()
@@ -214,7 +214,7 @@ for index, topic in topics_df.iterrows():
                         st.error("回答を入力してください")
                     else:
                         db_handler.add_vote_to_sheet(title, submit_value, current_user)
-                        st.session_state.just_voted_topics.append(title)
+                        st.session_state.just_voted_topics.append(topic["uuid"])
                         st.success("投票しました！")
                         st.rerun()
 
@@ -222,7 +222,7 @@ for index, topic in topics_df.iterrows():
         with col2:
             st.write("### 📊 現在の投票数")
             # タイトルも文字型で比較して抽出
-            topic_votes = votes_df[votes_df["topic_title"] == str(title)] if not votes_df.empty else pd.DataFrame()
+            topic_votes = votes_df[votes_df["topic_title"] == str(topic["uuid"])] if not votes_df.empty else pd.DataFrame()
             
             if options_raw == "FREE_INPUT":
                 if topic_votes.empty:
@@ -244,6 +244,7 @@ for index, topic in topics_df.iterrows():
                     counts = topic_votes["option"].value_counts()
                     for opt in options:
                         st.write(f"{opt}：{counts.get(opt, 0)} 票")
+
 
 
 
