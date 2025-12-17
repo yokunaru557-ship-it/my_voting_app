@@ -121,13 +121,19 @@ else:
     # 表表示
     st.dataframe(result_df, hide_index=True)
 
-    if st.button("🗑️ 議題を削除"):
-        deleted = db_handler.delete_topic(selected_topic, current_user, logical=True)
-        if deleted:
-            st.success(f"「{selected_topic}」を削除しました。")
-            
-        else:
-            st.error("削除できませんでした（権限がないか既に削除済み）")
+# finished_topics から選択されたトピックの UUID を取得
+if not finished_topics.empty and selected_topic in finished_topics["title"].values:
+    topic_uuid = finished_topics[finished_topics["title"] == selected_topic]["uuid"].values[0]
+else:
+    topic_uuid = None
+
+# 削除ボタン
+if st.button("🗑️ 議題を削除") and topic_uuid:
+    deleted = db_handler.delete_topic_by_uuid(topic_uuid, current_user)
+    if deleted:
+        st.success(f"「{selected_topic}」を削除しました。")
+    else:
+        st.error("削除できませんでした（権限がないか既に削除済み）")
 
 
     
@@ -191,6 +197,7 @@ else:
 st.divider()
 if st.button("🔄 更新"):
     st.rerun()
+
 
 
 
