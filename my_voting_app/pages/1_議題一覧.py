@@ -42,6 +42,7 @@ with col1:
 with col2:
     st.write("")
     st.write("")
+    st.write("")
     my_only = st.checkbox("自分の議題のみ表示")
 with col3:
     st.write("")
@@ -246,6 +247,7 @@ for index, topic in topics_df.iterrows():
                     counts = topic_votes["option"].value_counts()
                     for opt in options:
                         st.write(f"{opt}：{counts.get(opt, 0)} 票")
+
 
 
 
