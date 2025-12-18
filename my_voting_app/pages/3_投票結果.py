@@ -140,7 +140,7 @@ if st.button("🗑️ 議題を削除") and topic_uuid:
     # ===== Geminiによる分析機能 =====
     st.subheader("🔍 Gemini による投票結果分析")
     
-    if st.button("AIに分析してもらう"):
+    st.button("AIに分析してもらう"):
         with st.spinner("Gemini が分析中です..."):
     
             # 分析用の文章生成
@@ -196,6 +196,7 @@ if st.button("🗑️ 議題を削除") and topic_uuid:
 st.divider()
 if st.button("🔄 更新"):
     st.rerun()
+
 
 
 
