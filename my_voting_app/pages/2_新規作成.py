@@ -19,7 +19,7 @@ if "logged_in_user" not in st.session_state or st.session_state.logged_in_user i
     st.warning("⚠️ このページを見るにはログインが必要です。")
     st.page_link("Home.py", label="ログイン画面へ戻る", icon="🏠")
     st.stop()
-st.divider()
+
 # ---------------------------------------------------------
 # 状態管理
 # ---------------------------------------------------------
@@ -71,7 +71,7 @@ if st.session_state.creation_completed:
 else:
     st.title("✨ 新しい議題を作成する")
     st.markdown("チームのみんなに聞いてみたいことを投稿しましょう！")
-    
+    st.divider()
     with st.container(border=True):
         st.subheader("📝 議題の内容")
         title = st.text_input("議題のタイトル", placeholder="例：来週のランチどこ行く？", key="input_title")
@@ -172,6 +172,7 @@ else:
                     st.rerun() 
                 except Exception as e:
                     st.error(f"保存に失敗しました...: {e}")
+
 
 
 
