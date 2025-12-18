@@ -24,7 +24,7 @@ st.set_page_config(page_title="投票結果", page_icon="📊")
 
 st.title("📊 投票結果一覧")
 st.caption("締切済みの議題のみ表示します")
-
+st.divider()
 set_background("background.png")  # 背景画像の設定
 
 # ---------------------------------------------------------
@@ -187,6 +187,7 @@ CSVデータ:{result_df.to_csv(index=False)}
         )
 
         st.write(response.text)
+
 
 
 
