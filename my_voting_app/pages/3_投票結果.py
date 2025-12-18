@@ -138,7 +138,20 @@ if st.button("🗑️ 議題を削除") and topic_uuid:
         st.error("削除できませんでした（権限がないか既に削除済み）")
 
 
+if not result_df.empty:
     
+    
+    fig = px.bar(
+        result_df,
+        x="選択肢",
+        y="投票数",
+        text="投票数",
+        title=f"議題: {selected_topic} の投票結果"
+    )
+    fig.update_traces(textposition="outside")
+    fig.update_layout(yaxis=dict(dtick=1))  # Y軸を整数刻みに
+    
+    st.plotly_chart(fig, use_container_width=True)    
     
 # =============================
 # Gemini による分析
@@ -189,6 +202,7 @@ CSVデータ:{result_df.to_csv(index=False)}
         )
 
         st.write(response.text)
+
 
 
 
