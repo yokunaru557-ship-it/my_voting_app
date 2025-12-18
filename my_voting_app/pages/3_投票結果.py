@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import plotly.express as px
 import time
 import sys
 import os
@@ -202,6 +203,7 @@ CSVデータ:{result_df.to_csv(index=False)}
         )
 
         st.write(response.text)
+
 
 
 
