@@ -97,7 +97,7 @@ votes_df = load_votes()
 # ---------------------------------------------------------
 # データ加工
 # ---------------------------------------------------------
-now = datetime.datetime.now()
+now = pd.Timestamp.now(tz="Asia/Tokyo").tz_localize(None)
 
 topics_df["deadline"] = pd.to_datetime(
     topics_df["deadline"],
@@ -260,6 +260,7 @@ for index, topic in display_df.iterrows():
                     counts = topic_votes["option"].value_counts()
                     for opt in options:
                         st.write(f"{opt}：{counts.get(opt, 0)} 票")
+
 
 
 
