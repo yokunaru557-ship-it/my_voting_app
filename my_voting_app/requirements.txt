@@ -4,3 +4,4 @@ gspread
 google-genai
 oauth2client
 google-auth-oauthlib
+plotly.express
