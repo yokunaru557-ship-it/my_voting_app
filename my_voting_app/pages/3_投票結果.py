@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-
+import time
 import sys
 import os
 from background import set_background  #  # 背景画像の設定ファイルをインポート
@@ -131,6 +131,7 @@ if st.button("🗑️ 議題を削除") and topic_uuid:
     deleted = db_handler.delete_topic_by_uuid(topic_uuid, current_user)
     if deleted:
         st.success(f"「{selected_topic}」を削除しました。")
+        time.sleep(3)
         st.rerun()
     else:
         st.error("削除できませんでした（権限がないか既に削除済み）")
@@ -187,6 +188,7 @@ CSVデータ:{result_df.to_csv(index=False)}
         )
 
         st.write(response.text)
+
 
 
 
