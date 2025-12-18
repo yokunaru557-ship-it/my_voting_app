@@ -159,7 +159,7 @@ for index, topic in topics_df.iterrows():
             has_voted = True
     
     # 2. 直前の操作履歴チェック
-    if title in st.session_state.just_voted_topics:
+    if str(topic["uuid"]) in st.session_state.just_voted_topics:
         has_voted = True
 
     with st.container(border=True):
@@ -244,6 +244,7 @@ for index, topic in topics_df.iterrows():
                     counts = topic_votes["option"].value_counts()
                     for opt in options:
                         st.write(f"{opt}：{counts.get(opt, 0)} 票")
+
 
 
 
