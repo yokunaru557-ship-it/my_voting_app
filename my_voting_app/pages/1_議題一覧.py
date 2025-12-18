@@ -101,6 +101,8 @@ now = datetime.datetime.now()
 topics_df["deadline"] = pd.to_datetime(topics_df["deadline"], errors="coerce", format="%Y-%m-%d %H:%M")
 topics_df = topics_df[topics_df["deadline"].isna() | (topics_df["deadline"] >= now)]
 filtered_df = topics_df[topics_df["status"] != "deleted"].copy()
+filtered_df = filtered_df[filtered_df["uuid"].notna() & (filtered_df["uuid"] != "")]
+
 
 if st.session_state.fg == 0:
     topics_df = topics_df.sort_values("deadline", ascending=True)
@@ -244,6 +246,7 @@ for index, topic in topics_df.iterrows():
                     counts = topic_votes["option"].value_counts()
                     for opt in options:
                         st.write(f"{opt}：{counts.get(opt, 0)} 票")
+
 
 
 
