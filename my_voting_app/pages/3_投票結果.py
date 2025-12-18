@@ -149,10 +149,10 @@ if not result_df.empty:
         text="投票数",
         title=f"議題: {selected_topic} の投票結果"
     )
-    fig.update_traces(textposition="outside")
-    fig.update_layout(yaxis=dict(dtick=1))  # Y軸を整数刻みに
-    
-    st.plotly_chart(fig, use_container_width=True)    
+# Plotly 円グラフ
+fig = px.pie(result_df, names="選択肢", values="投票数", 
+             title="投票結果")
+st.plotly_chart(fig)
     
 # =============================
 # Gemini による分析
@@ -203,6 +203,7 @@ CSVデータ:{result_df.to_csv(index=False)}
         )
 
         st.write(response.text)
+
 
 
 
