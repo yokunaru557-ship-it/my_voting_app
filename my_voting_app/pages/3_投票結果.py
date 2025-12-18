@@ -61,13 +61,13 @@ current_user = str(st.session_state.logged_in_user).strip()
 # 締切済み ＋ 自分が作成した議題のみ抽出
 if (
     not topics_df.empty
-    and {"deadline_date", "status", "owner_email"}.issubset(topics_df.columns)
+    and {"deadline_parsed", "status", "owner_email"}.issubset(topics_df.columns)
 ):
     finished_topics = topics_df[
         (
             (
-                topics_df["deadline_date"].notna()
-                & (topics_df["deadline_date"] < now)
+                topics_df["deadline_parsed"].notna()
+                & (topics_df["deadline_parsed"] < now)
             )
             | (topics_df["status"] == "closed")
         )
@@ -187,6 +187,7 @@ CSVデータ:{result_df.to_csv(index=False)}
         )
 
         st.write(response.text)
+
 
 
 
