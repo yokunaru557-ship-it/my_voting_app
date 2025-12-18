@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import time
 import datetime
 import sys
 import os
@@ -232,6 +233,7 @@ for index, topic in display_df.iterrows():
                         db_handler.add_vote_to_sheet(title, submit_value, current_user,topic["uuid"])
                         st.session_state.just_voted_topics.append(topic["uuid"])
                         st.success("投票しました！")
+                        time.sleep(3)
                         st.rerun()
 
         # 右カラム：投票数集計表示
@@ -260,6 +262,7 @@ for index, topic in display_df.iterrows():
                     counts = topic_votes["option"].value_counts()
                     for opt in options:
                         st.write(f"{opt}：{counts.get(opt, 0)} 票")
+
 
 
 
