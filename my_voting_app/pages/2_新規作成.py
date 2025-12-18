@@ -19,7 +19,7 @@ if "logged_in_user" not in st.session_state or st.session_state.logged_in_user i
     st.warning("⚠️ このページを見るにはログインが必要です。")
     st.page_link("Home.py", label="ログイン画面へ戻る", icon="🏠")
     st.stop()
-
+st.divider()
 # ---------------------------------------------------------
 # 状態管理
 # ---------------------------------------------------------
@@ -172,6 +172,7 @@ else:
                     st.rerun() 
                 except Exception as e:
                     st.error(f"保存に失敗しました...: {e}")
+
 
 
 
