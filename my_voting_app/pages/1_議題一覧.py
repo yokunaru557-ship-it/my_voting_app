@@ -213,7 +213,7 @@ for index, topic in topics_df.iterrows():
                     if not submit_value:
                         st.error("回答を入力してください")
                     else:
-                        db_handler.add_vote_to_sheet(title, submit_value, current_user)
+                        db_handler.add_vote_to_sheet(title, submit_value, current_user,topic["uuid"])
                         st.session_state.just_voted_topics.append(topic["uuid"])
                         st.success("投票しました！")
                         st.rerun()
@@ -244,6 +244,7 @@ for index, topic in topics_df.iterrows():
                     counts = topic_votes["option"].value_counts()
                     for opt in options:
                         st.write(f"{opt}：{counts.get(opt, 0)} 票")
+
 
 
 
