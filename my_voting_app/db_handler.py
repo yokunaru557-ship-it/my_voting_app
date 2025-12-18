@@ -115,7 +115,9 @@ def get_votes_from_sheet():
         return pd.DataFrame()
 
 
-
+#---------------------------------------------------------
+#    議題の論理削除
+#---------------------------------------------------------
 def delete_topic_by_uuid(uuid, owner_email):
     sheet = connect_to_sheet()
     if sheet is None:
@@ -160,6 +162,7 @@ def close_topic_status(topic_title):
         
     except Exception as e:
         st.error(f"ステータス更新エラー: {e}")
+
 
 
 
