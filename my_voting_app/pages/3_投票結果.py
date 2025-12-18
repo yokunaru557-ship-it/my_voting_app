@@ -131,6 +131,7 @@ if st.button("🗑️ 議題を削除") and topic_uuid:
     deleted = db_handler.delete_topic_by_uuid(topic_uuid, current_user)
     if deleted:
         st.success(f"「{selected_topic}」を削除しました。")
+        st.rerun()
     else:
         st.error("削除できませんでした（権限がないか既に削除済み）")
 
@@ -186,6 +187,7 @@ CSVデータ:{result_df.to_csv(index=False)}
         )
 
         st.write(response.text)
+
 
 
 
