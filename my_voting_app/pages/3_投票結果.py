@@ -142,7 +142,7 @@ if st.button("🗑️ 議題を削除") and topic_uuid:
 # =============================
 st.divider()
 st.subheader("🔍 Geminiによる投票結果分析")
-if st.button("AIに分析してもらう"):
+if st.button("🧠AIに分析してもらう"):
     with st.spinner("Gemini が分析中です..."):
 
         analysis_prompt = f"""
@@ -186,6 +186,7 @@ CSVデータ:{result_df.to_csv(index=False)}
         )
 
         st.write(response.text)
+
 
 
 
