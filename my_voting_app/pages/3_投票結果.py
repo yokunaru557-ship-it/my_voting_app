@@ -45,11 +45,11 @@ if not topics_df.empty and "deadline" in topics_df.columns:
     topics_df["deadline_parsed"] = pd.to_datetime(
         topics_df["deadline"], errors="coerce"
     )
-    topics_df["deadline_date"] = topics_df["deadline_parsed"].dt.date
+    
 
 
 # 今日の日付
-today = pd.Timestamp.now(tz="Asia/Tokyo").date()
+now = pd.Timestamp.now(tz="Asia/Tokyo").tz_localize(None)
 
 
 
@@ -67,7 +67,7 @@ if (
         (
             (
                 topics_df["deadline_date"].notna()
-                & (topics_df["deadline_date"] < today)
+                & (topics_df["deadline_date"] < now)
             )
             | (topics_df["status"] == "closed")
         )
@@ -187,6 +187,7 @@ CSVデータ:{result_df.to_csv(index=False)}
         )
 
         st.write(response.text)
+
 
 
 
