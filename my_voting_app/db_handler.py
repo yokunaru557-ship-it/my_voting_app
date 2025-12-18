@@ -93,7 +93,7 @@ def add_vote_to_sheet(topic_title, option, user_email,uuid):
         voted_at = datetime.datetime.now(JST).strftime("%Y-%m-%d %H:%M:%S")
         
         # ▼▼▼ 最後に user_email を保存します ▼▼▼
-        new_row = [topic_title, option, voted_at, user_email]
+        new_row = [topic_title, option, voted_at, user_email,uuid]
         
         worksheet.append_row(new_row)
     except Exception as e:
@@ -160,6 +160,7 @@ def close_topic_status(topic_title):
         
     except Exception as e:
         st.error(f"ステータス更新エラー: {e}")
+
 
 
 
