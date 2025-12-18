@@ -140,7 +140,7 @@ if my_only:
     if display_df.empty:
         st.info("あなたが作成した議題はありません。")
         st.stop()
-
+st.write("現在時刻(now):", now)
 # ---------------------------------------------------------
 # 議題ループ表示
 # ---------------------------------------------------------
@@ -260,6 +260,7 @@ for index, topic in display_df.iterrows():
                     counts = topic_votes["option"].value_counts()
                     for opt in options:
                         st.write(f"{opt}：{counts.get(opt, 0)} 票")
+
 
 
 
