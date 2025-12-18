@@ -49,7 +49,8 @@ if not topics_df.empty and "deadline" in topics_df.columns:
 
 
 # 今日の日付
-today = pd.to_datetime("now").date()
+today = pd.Timestamp.now(tz="Asia/Tokyo").date()
+
 
 
 
@@ -186,6 +187,7 @@ CSVデータ:{result_df.to_csv(index=False)}
         )
 
         st.write(response.text)
+
 
 
 
