@@ -87,7 +87,7 @@ else:
     topic_titles = finished_topics["title"].tolist()
 
 selected_topic = st.selectbox("議題を選択してください", topic_titles)
-
+result_df = pd.DataFrame()
 
 # 表示処理
 if finished_topics.empty or selected_topic == "（締切済みの議題がありません）":
@@ -202,6 +202,7 @@ CSVデータ:{result_df.to_csv(index=False)}
         )
 
         st.write(response.text)
+
 
 
 
