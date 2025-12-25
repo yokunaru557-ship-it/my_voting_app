@@ -110,7 +110,6 @@ else:
     result = []
 
     if options is None:
-        st.info("表示できる投票結果がありません")
         st.stop()
     else:
         if options == ["FREE_INPUT"]:
@@ -215,6 +214,7 @@ CSVデータ:{result_df.to_csv(index=False)}
         )
 
         st.write(response.text)
+
 
 
 
