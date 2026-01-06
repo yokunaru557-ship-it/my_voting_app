@@ -213,7 +213,9 @@ CSVデータ:{result_df.to_csv(index=False)}
             contents=analysis_prompt
         )
 
-        st.write(response.text)
+        st.markdown(response.text)
+        #st.write(response.text)
+
 
 
 
