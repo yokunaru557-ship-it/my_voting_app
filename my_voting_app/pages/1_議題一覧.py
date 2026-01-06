@@ -98,19 +98,23 @@ votes_df = load_votes()
 # ---------------------------------------------------------
 # データ加工
 # ---------------------------------------------------------
-now = pd.Timestamp.now(tz="Asia/Tokyo").tz_localize(None)
+now = pd.Timestamp.now(tz="Asia/Tokyo")
 
-topics_df["deadline"] = pd.to_datetime(
-    topics_df["deadline"],
-    errors="coerce",
-    format="%Y-%m-%d %H:%M"
+topics_df["deadline"] = (
+    pd.to_datetime(
+        topics_df["deadline"],
+        errors="coerce",
+        format="%Y-%m-%d %H:%M"
+    )
+    .dt.tz_localize("Asia/Tokyo")
 )
 
 display_df = topics_df.copy()
 
 # 締め切りフィルタ
-display_df = display_df[
-    display_df["deadline"].isna() | (display_df["deadline"] >= now)
+display_df = topics_df[
+    topics_df["deadline"].isna() |
+    (topics_df["deadline"] >= now)
 ]
 
 # 削除済み除外
@@ -262,6 +266,7 @@ for index, topic in display_df.iterrows():
                     counts = topic_votes["option"].value_counts()
                     for opt in options:
                         st.write(f"{opt}：{counts.get(opt, 0)} 票")
+
 
 
 
