@@ -213,8 +213,11 @@ CSVデータ:{result_df.to_csv(index=False)}
             contents=analysis_prompt
         )
 
-        st.markdown(response.text)
+        with st.expander("詳細を見る"):
+            st.markdown(response.text)
+        #st.markdown(response.text)
         #st.write(response.text)
+
 
 
 
